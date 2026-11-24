@@ -2,7 +2,7 @@
 // background-<number>.(jpg|jpeg|png|webp|avif) is picked up and shown in
 // number order as the visitor scrolls. Add, replace or remove files there and
 // the site follows, with no code changes.
-const found = import.meta.glob("../../images/background-*.{jpg,jpeg,png,webp,avif}", {
+const found = import.meta.glob("../images/background-*.{jpg,jpeg,png,webp,avif}", {
   eager: true,
   query: "?url",
   import: "default",
