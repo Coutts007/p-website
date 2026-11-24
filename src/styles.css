@@ -108,21 +108,17 @@ svg {
   position: absolute;
   inset: -6%;
   background-size: cover;
-  background-position: 50% calc(30% + var(--progress) * 40%);
-  transform: translate3d(calc(var(--pxn) * -14px), calc(var(--scroll) * -0.012px), 0) scale(1.04);
-  animation: photo-breathe 40s ease-in-out infinite alternate;
+  background-position: 50% 40%;
+  /* Only transform and opacity change while scrolling, so the compositor does the work. */
+  transform: translate3d(calc(var(--pxn, 0) * -14px), calc(var(--scroll, 0) * -0.02px), 0) scale(1.08);
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 /* Photo i is fully shown when the scroll position lands on it, and crossfades with its neighbours. */
 .photo {
   --x: calc(var(--progress) * (var(--n) - 1));
   --d: max(calc(var(--x) - var(--i)), calc(var(--i) - var(--x)));
   opacity: clamp(0, calc((0.75 - var(--d)) * 4), 1);
-}
-@keyframes photo-breathe {
-  to {
-    scale: 1.07;
-  }
 }
 /* A dark veil keeps the text readable over the photographs. */
 .sky-veil {
@@ -141,18 +137,13 @@ svg {
   height: 680px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255, 225, 180, 0.12), transparent 66%);
-  transform: translate3d(calc(var(--px) - 340px), calc(var(--py) - 340px), 0);
+  transform: translate3d(calc(var(--px, 0px) - 340px), calc(var(--py, 0px) - 340px), 0);
   opacity: 0;
   transition: opacity 0.8s;
   z-index: 3;
 }
-.has-pointer .backdrop::before {
+.backdrop.has-pointer::before {
   opacity: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-  .photo {
-    animation: none;
-  }
 }
 .grain {
   position: absolute;
@@ -1425,5 +1416,49 @@ button.bead[aria-pressed="true"] {
   .glass--tilt,
   .js .glass--tilt.is-in {
     transform: none;
+  }
+}
+
+/* ---------- Speed: lighter effects and snappier motion on phones and tablets ---------- */
+a,
+button,
+summary,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 900px), (hover: none) {
+  /* Blurring the moving photo behind every panel is the costliest thing a phone does. */
+  .nav,
+  .glass,
+  .glass--tilt,
+  [class*="chip"],
+  [class*="pill"] {
+    -webkit-backdrop-filter: blur(7px);
+    backdrop-filter: blur(7px);
+  }
+  .nav,
+  .glass {
+    background-color: rgba(18, 12, 14, 0.5);
+  }
+  .photo {
+    transform: translate3d(0, calc(var(--scroll, 0) * -0.02px), 0) scale(1.08);
+  }
+  /* Reveal with fade and slide only: no blur filter, shorter and earlier. */
+  .js [data-reveal] {
+    transform: translateY(16px);
+    filter: none;
+  }
+  .js [data-reveal].is-in {
+    transition:
+      opacity 0.5s var(--ease) calc(var(--d, 0s) * 0.4),
+      transform 0.6s var(--ease) calc(var(--d, 0s) * 0.4);
+  }
+  .js .glass--tilt.is-in {
+    transform: none;
+    transition: opacity 0.5s var(--ease);
+  }
+  .glass__glint {
+    display: none;
   }
 }

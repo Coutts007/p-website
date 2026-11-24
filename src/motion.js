@@ -28,12 +28,16 @@ export function useAmbientMotion() {
             }
           });
         },
-        { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+        { threshold: 0.05, rootMargin: "0px 0px 6% 0px" }
       );
       const observeAll = () => targets().forEach((el) => revealObserver.observe(el));
       observeAll();
       // Panels added later (for example after filtering projects) are picked up too.
-      const domWatcher = new MutationObserver(observeAll);
+      let watchFrame = 0;
+      const domWatcher = new MutationObserver(() => {
+        cancelAnimationFrame(watchFrame);
+        watchFrame = requestAnimationFrame(observeAll);
+      });
       domWatcher.observe(document.body, { childList: true, subtree: true });
       cleanups.push(() => {
         revealObserver.disconnect();
@@ -41,51 +45,79 @@ export function useAmbientMotion() {
       });
     }
 
-    // 2. Scroll progress and parallax depth.
+    // 2. Scroll progress and parallax depth. These values are written only to the
+    // few elements that use them (not the whole page), so a scroll frame never
+    // forces the browser to re-style every element in the document.
+    const backdrop = document.querySelector(".backdrop");
+    const nav = document.querySelector(".nav");
+    let maxScroll = 1;
+    const measure = () => {
+      maxScroll = Math.max(1, root.scrollHeight - window.innerHeight);
+    };
+    measure();
+    const resizeObserver = "ResizeObserver" in window ? new ResizeObserver(measure) : null;
+    if (resizeObserver) resizeObserver.observe(document.body);
+    window.addEventListener("resize", measure, { passive: true });
+    cleanups.push(() => {
+      if (resizeObserver) resizeObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    });
+
     let ticking = false;
+    let lastY = -1;
+    const apply = () => {
+      ticking = false;
+      const y = window.scrollY;
+      if (y === lastY) return;
+      lastY = y;
+      const progress = String(Math.min(1, y / maxScroll));
+      if (backdrop) {
+        backdrop.style.setProperty("--progress", progress);
+        backdrop.style.setProperty("--scroll", String(y));
+      }
+      if (nav) nav.style.setProperty("--progress", progress);
+    };
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
-      requestAnimationFrame(() => {
-        const max = root.scrollHeight - window.innerHeight || 1;
-        root.style.setProperty("--progress", String(Math.min(1, window.scrollY / max)));
-        root.style.setProperty("--scroll", String(window.scrollY));
-        ticking = false;
-      });
+      requestAnimationFrame(apply);
     };
-    onScroll();
+    apply();
     window.addEventListener("scroll", onScroll, { passive: true });
     cleanups.push(() => window.removeEventListener("scroll", onScroll));
 
-    if (reduced()) return () => cleanups.forEach((fn) => fn());
+    // Touch screens have no hover, so skip all pointer effects there entirely.
+    const finePointer = window.matchMedia && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (reduced() || !finePointer) return () => cleanups.forEach((fn) => fn());
 
-    // 3. A warm light follows the pointer across the lacquer backdrop.
+    // 3. A warm light follows the pointer across the backdrop.
     let lightFrame = 0;
     const onPointer = (e) => {
-      if (e.pointerType === "touch") return;
       cancelAnimationFrame(lightFrame);
       lightFrame = requestAnimationFrame(() => {
-        root.style.setProperty("--px", `${e.clientX}px`);
-        root.style.setProperty("--py", `${e.clientY}px`);
-        root.style.setProperty("--pxn", String(e.clientX / window.innerWidth - 0.5));
-        root.style.setProperty("--pyn", String(e.clientY / window.innerHeight - 0.5));
-        root.classList.add("has-pointer");
+        if (!backdrop) return;
+        backdrop.style.setProperty("--px", `${e.clientX}px`);
+        backdrop.style.setProperty("--py", `${e.clientY}px`);
+        backdrop.style.setProperty("--pxn", String(e.clientX / window.innerWidth - 0.5));
+        backdrop.style.setProperty("--pyn", String(e.clientY / window.innerHeight - 0.5));
+        backdrop.classList.add("has-pointer");
       });
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
     cleanups.push(() => window.removeEventListener("pointermove", onPointer));
 
     // 4. Magnetic buttons lean toward the pointer, then settle back.
+    let magnet = null;
     const onMagnet = (e) => {
       const el = e.target.closest && e.target.closest(".btn, .icon-btn, .link-pill");
-      document.querySelectorAll(".is-magnet").forEach((m) => {
-        if (m !== el) {
-          m.classList.remove("is-magnet");
-          m.style.removeProperty("--tx");
-          m.style.removeProperty("--ty");
-        }
-      });
-      if (!el || e.pointerType === "touch") return;
+      if (magnet && magnet !== el) {
+        magnet.classList.remove("is-magnet");
+        magnet.style.removeProperty("--tx");
+        magnet.style.removeProperty("--ty");
+        magnet = null;
+      }
+      if (!el) return;
+      magnet = el;
       const r = el.getBoundingClientRect();
       el.classList.add("is-magnet");
       el.style.setProperty("--tx", `${(e.clientX - (r.left + r.width / 2)) * 0.22}px`);
