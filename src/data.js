@@ -51,7 +51,7 @@ export const projects = [
       "Recruiters can review, search and discuss technical evidence, with every result traced back to observable public work.",
     ],
     stack: [], // TODO: add the tech stack
-    links: [{ label: "On GitHub", href: GITHUB }],
+    links: [{ label: "On GitHub", href: "https://github.com/Coutts007/classicdevs-zinduathon" }, { label: "Visit site", href: "https://skillproofc.netlify.app" }],
   },
   {
     id: "mazaox",
@@ -69,7 +69,7 @@ export const projects = [
       "React and TypeScript client built with Vite. Payments are simulated for the prototype.",
     ],
     stack: ["Django", "Django REST Framework", "PostgreSQL", "Redis", "React", "TypeScript", "Vite"],
-    links: [{ label: "On GitHub", href: GITHUB }],
+    links: [{ label: "On GitHub", href: "https://github.com/Coutts007/mazaoX" }],
   },
   {
     id: "magivents",
@@ -84,7 +84,7 @@ export const projects = [
       "Built event creation, attendee registration and management of who attends physically and who joins virtually.",
     ],
     stack: ["Python", "Django", "DRF", "React", "TypeScript"],
-    links: [{ label: "On GitHub", href: GITHUB }],
+    links: [{ label: "On GitHub", href: "https://github.com/Coutts007/MagiVents_backend" }, { label: "Visit site", href: "https://magiventske.netlify.app" }],
   },
   {
     id: "altastudy",
@@ -116,7 +116,7 @@ export const projects = [
       "FastAPI and SQLAlchemy backend around a Random Forest model, with responses under 180 ms so tariffs update in real time.",
     ],
     stack: ["Python", "Streamlit", "FastAPI", "SQLAlchemy", "Random Forest"],
-    links: [{ label: "On GitHub", href: GITHUB }],
+    links: [{ label: "On GitHub", href: "https://github.com/Coutts007/hackathon_prototype" }],
   },
   {
     id: "tailoring",
