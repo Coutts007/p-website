@@ -21,12 +21,12 @@ export const person = {
 };
 
 export const contact = {
-  email: "petershemaya007@email.com", // TODO: confirm the domain (gmail.com?)
+  email: "petershemaya007@gmail.com",
   phone: "+254 115 945 361",
   socials: [
     { id: "github", label: "GitHub", handle: "github.com/Coutts007", href: GITHUB },
     { id: "linkedin", label: "LinkedIn", handle: "in/peter-shemaya-357248339", href: LINKEDIN },
-    { id: "email", label: "Email", handle: "petershemaya007@email.com", href: "mailto:petershemaya007@email.com" },
+    { id: "email", label: "Email", handle: "petershemaya007@gmail.com", href: "mailto:petershemaya007@gmail.com" },
     { id: "phone", label: "Phone", handle: "+254 115 945 361", href: "tel:+254115945361" },
   ],
 };

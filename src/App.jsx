@@ -1,4 +1,5 @@
 import { useAmbientMotion } from "./motion.js";
+import { backgrounds } from "./backgrounds.js";
 import Nav from "./components/Nav.jsx";
 import Hero from "./components/Hero.jsx";
 import Projects from "./components/Projects.jsx";
@@ -28,9 +29,14 @@ export default function App() {
   return (
     <>
       <div className="backdrop" aria-hidden="true">
-        <span className="orb orb--one" />
-        <span className="orb orb--two" />
-        <span className="orb orb--three" />
+        {backgrounds.map((url, i) => (
+          <span
+            key={`${i}-${url}`}
+            className="photo"
+            style={{ "--i": i, "--n": backgrounds.length, backgroundImage: `url(${url})` }}
+          />
+        ))}
+        <span className="sky-veil" />
         <span className="grain" />
       </div>
 
@@ -58,7 +64,7 @@ export default function App() {
 
       <footer className="footer">
         <div className="wrap footer__inner">
-          <p>© {new Date().getFullYear()} {person.name}. Built with React.</p>
+          <p>© {new Date().getFullYear()} {person.name}.</p>
           <a href="#top">Back to top</a>
         </div>
       </footer>
