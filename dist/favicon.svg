@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2a1a14"/>
+      <stop offset="1" stop-color="#0c0908"/>
+    </linearGradient>
+    <linearGradient id="fg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4ebdc"/>
+      <stop offset="1" stop-color="#c4a982"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
+  <text x="32" y="43" text-anchor="middle" font-family="'Bodoni Moda','Bodoni 72',Didot,Georgia,serif" font-size="30" font-weight="700" fill="url(#fg)" letter-spacing="-1">PS</text>
+</svg>
